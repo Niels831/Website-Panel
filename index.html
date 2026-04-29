@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZansPanel - Premium Server & Hosting Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            900: '#0a0a0f',
+                            800: '#0f0f1a',
+                            700: '#151525',
+                            600: '#1a1a2e',
+                            500: '#222240',
+                        },
+                        accent: {
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0f; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 3px; }
+        
+        /* Glow effects */
+        .glow-accent { box-shadow: 0 0 30px rgba(99, 102, 241, 0.3); }
+        .glow-accent-sm { box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        .glow-cyan { box-shadow: 0 0 30px rgba(6, 182, 212, 0.3); }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 8px 40px rgba(99, 102, 241, 0.15);
+        }
+        
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float { animation: float 3s ease-in-out infinite; }
+        
+        /* Pulse ring */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid #6366f1;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+        
+        /* Grid background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* Status dot */
+        .status-online { 
+            width: 8px; height: 8px; border-radius: 50%; background: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.7);
+        }
+        
+        /* Toast */
+        .toast {
+            animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Nav blur */
+        .nav-blur {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 15, 0.8);
+        }
+
+        /* Product badge */
+        .badge-hot {
+            background: linear-gradient(135deg, #ef4444, #f97316);
+        }
+        .badge-new {
+            background: linear-gradient(135deg, #22c55e, #06b6d4);
+        }
+        .badge-popular {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        /* Shimmer */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(99,102,241,0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="grid-bg">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-blur border-b border-dark-500/50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 group">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-500 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i data-lucide="server" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">ZansPanel</span>
+                </a>
+
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="#home" class="px-4 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Home</a>
+                    <a href="#products" class="px-4 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Products</a>
+                    <a href="#features" class="px-4 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Features</a>
+                    <a href="#pricing" class="px-4 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Pricing</a>
+                    <a href="#testimonials" class="px-4 py-2 rounded-lg text-sm text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Reviews</a>
+                </div>
+
+                <!-- Right side -->
+                <div class="hidden md:flex items-center gap-3">
+                    <button onclick="openCart()" class="relative p-2 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        <span id="cart-badge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-accent-500 rounded-full text-[10px] font-bold text-white flex items-center justify-center">0</span>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="status-online"></div>
+                        <span class="text-xs text-green-400">Online</span>
+                    </div>
+                    <a href="https://discord.gg/" target="_blank" class="px-4 py-2 bg-accent-600 hover:bg-accent-500 rounded-lg text-sm font-medium text-white transition-all hover:shadow-lg hover:shadow-accent-500/25">
+                        <span class="flex items-center gap-2">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            Discord
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-300 hover:text-white">
+                    <i data-lucide="menu" id="menu-icon" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 bottom-0 w-72 z-[60] bg-dark-800 border-r border-dark-500/50 p-6 pt-20">
+        <button onclick="toggleMobileMenu()" class="absolute top-5 right-5 text-gray-400 hover:text-white">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <div class="flex flex-col gap-2">
+            <a href="#home" onclick="toggleMobileMenu()" class="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Home</a>
+            <a href="#products" onclick="toggleMobileMenu()" class="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Products</a>
+            <a href="#features" onclick="toggleMobileMenu()" class="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Features</a>
+            <a href="#pricing" onclick="toggleMobileMenu()" class="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Pricing</a>
+            <a href="#testimonials" onclick="toggleMobileMenu()" class="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all">Reviews</a>
+            <hr class="border-dark-500 my-3">
+            <button onclick="openCart(); toggleMobileMenu();" class="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-dark-500/50 transition-all text-left flex items-center gap-2">
+                <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                Cart (<span id="cart-badge-mobile">0</span>)
+            </button>
+            <a href="https://discord.gg/" target="_blank" class="mt-2 px-4 py-3 bg-accent-600 hover:bg-accent-500 rounded-lg text-sm font-medium text-white transition-all text-center flex items-center justify-center gap-2">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                Join Discord
+            </a>
+        </div>
+    </div>
+    <div id="mobile-overlay" onclick="toggleMobileMenu()" class="hidden fixed inset-0 bg-black/50 z-[55]"></div>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center pt-16 overflow-hidden">
+        <!-- Background effects -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Left content -->
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-accent-500/10 border border-accent-500/20 rounded-full text-sm text-accent-400">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span>Premium Server & Hosting</span>
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+                        Server <span class="gradient-text">Premium</span> dengan Harga <span class="gradient-text">Terjangkau</span>
+                    </h1>
+                    
+                    <p class="text-lg text-gray-400 max-w-lg">
+                        Dapatkan layanan VPS, Game Server, dan Hosting dengan performa tinggi. Dikelola langsung dari panel kami, siap digunakan dalam hitungan detik! 🚀
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <a href="#products" class="px-8 py-4 bg-gradient-to-r from-accent-600 to-accent-500 hover:from-accent-500 hover:to-accent-400 rounded-xl text-white font-semibold transition-all glow-accent-sm hover:glow-accent text-center">
+                            <span class="flex items-center justify-center gap-2">
+                                <i data-lucide="rocket" class="w-5 h-5"></i>
+                                Lihat Produk
+                            </span>
+                        </a>
+                        <a href="#pricing" class="px-8 py-4 bg-dark-600 hover:bg-dark-500 border border-dark-500 rounded-xl text-gray-300 hover:text-white font-semibold transition-all text-center">
+                            <span class="flex items-center justify-center gap-2">
+                                <i data-lucide="tag" class="w-5 h-5"></i>
+                                Lihat Harga
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-6 pt-4">
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-bold gradient-text" id="stat-users">0</div>
+                            <div class="text-sm text-gray-500">Happy Users</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-bold gradient-text" id="stat-servers">0</div>
+                            <div class="text-sm text-gray-500">Active Servers</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-bold gradient-text">99.9%</div>
+                            <div class="text-sm text-gray-500">Uptime</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right visual -->
+                <div class="hidden lg:flex justify-center">
+                    <div class="relative float">
+                        <div class="w-80 h-80 rounded-3xl bg-gradient-to-br from-accent-600/20 to-cyan-500/20 border border-accent-500/20 flex items-center justify-center backdrop-blur-sm">
+                            <div class="text-center space-y-4">
+                                <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-accent-500 to-cyan-500 flex items-center justify-center">
+                                    <i data-lucide="server" class="w-10 h-10 text-white"></i>
+                                </div>
+                                <div class="text-xl font-bold text-white">ZansPanel</div>
+                                <div class="text-sm text-gray-400">Your Server, Your Rules</div>
+                                <div class="flex items-center justify-center gap-2 text-green-400 text-sm">
+                                    <div class="status-online"></div>
+                                    All Systems Operational
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Floating badges -->
+                        <div class="absolute -top-4 -right-4 px-3 py-2 bg-dark-600 border border-accent-500/30 rounded-xl text-sm shimmer">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-green-400"></i>
+                                DDoS Protected
+                            </span>
+                        </div>
+                        <div class="absolute -bottom-4 -left-4 px-3 py-2 bg-dark-600 border border-cyan-500/30 rounded-xl text-sm shimmer">
+                            <span class="flex items-center gap-2">
+                                <i data-lucide="cpu" class="w-4 h-4 text-cyan-400"></i>
+                                NVMe SSD
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section id="products" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section header -->
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-accent-500/10 border border-accent-500/20 rounded-full text-sm text-accent-400 mb-4">
+                    <i data-lucide="package" class="w-4 h-4"></i>
+                    Our Products
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Pilih <span class="gradient-text">Layanan</span> Kamu</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Semua layanan tersedia dengan performa tinggi dan dukungan 24/7. Pilih yang sesuai dengan kebutuhanmu!</p>
+            </div>
+
+            <!-- Category filter -->
+            <div class="flex flex-wrap justify-center gap-2 mb-12">
+                <button onclick="filterProducts('all')" class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition-all" data-category="all">
+                    Semua
+                </button>
+                <button onclick="filterProducts('vps')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-category="vps">
+                    <span class="flex items-center gap-1"><i data-lucide="server" class="w-4 h-4"></i> VPS</span>
+                </button>
+                <button onclick="filterProducts('game')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-category="game">
+                    <span class="flex items-center gap-1"><i data-lucide="gamepad-2" class="w-4 h-4"></i> Game</span>
+                </button>
+                <button onclick="filterProducts('hosting')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-category="hosting">
+                    <span class="flex items-center gap-1"><i data-lucide="globe" class="w-4 h-4"></i> Hosting</span>
+                </button>
+                <button onclick="filterProducts('bot')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium transition-all" data-category="bot">
+                    <span class="flex items-center gap-1"><i data-lucide="bot" class="w-4 h-4"></i> Bot</span>
+                </button>
+            </div>
+
+            <!-- Products grid -->
+            <div id="products-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Products will be rendered by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 relative">
+        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-500/30 to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-sm text-cyan-400 mb-4">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    Why Choose Us
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Kenapa Pilih <span class="gradient-text">ZansPanel</span>?</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Kami menyediakan layanan terbaik dengan infrastruktur yang handal dan tim support yang responsif.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 rounded-xl bg-accent-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="zap" class="w-6 h-6 text-accent-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Instant Deploy</h3>
+                    <p class="text-gray-400 text-sm">Server siap dalam hitungan detik, tidak perlu menunggu lama untuk mulai menggunakan layanan.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">DDoS Protection</h3>
+                    <p class="text-gray-400 text-sm">Perlindungan DDoS hingga 1Tbps untuk memastikan server kamu selalu online dan aman.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="headphones" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">24/7 Support</h3>
+                    <p class="text-gray-400 text-sm">Tim support kami siap membantu kapan saja melalui Discord dan ticket system.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="hard-drive" class="w-6 h-6 text-orange-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">NVMe Storage</h3>
+                    <p class="text-gray-400 text-sm">Storage super cepat dengan NVMe SSD untuk performa baca/tulis yang maksimal.</p>
+                </div>
+                <!-- Feature 5 -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="monitor" class="w-6 h-6 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Custom Panel</h3>
+                    <p class="text-gray-400 text-sm">Panel kontrol yang mudah digunakan untuk mengelola semua server kamu dalam satu dashboard.</p>
+                </div>
+                <!-- Feature 6 -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center mb-4">
+                        <i data-lucide="backup" class="w-6 h-6 text-rose-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Auto Backup</h3>
+                    <p class="text-gray-400 text-sm">Backup otomatis harian untuk memastikan data kamu selalu aman dan bisa di-restore kapan saja.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 relative">
+        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-500/30 to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-accent-500/10 border border-accent-500/20 rounded-full text-sm text-accent-400 mb-4">
+                    <i data-lucide="tag" class="w-4 h-4"></i>
+                    Pricing Plans
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Harga <span class="gradient-text">Terbaik</span> untuk Kamu</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Pilih paket VPS yang sesuai dengan kebutuhan dan budget kamu. Semua paket sudah termasuk DDoS protection!</p>
+            </div>
+
+            <!-- Pricing toggle -->
+            <div class="flex justify-center items-center gap-4 mb-12">
+                <span class="text-sm text-gray-400" id="label-monthly">Monthly</span>
+                <button onclick="toggleBilling()" id="billing-toggle" class="w-14 h-7 bg-dark-600 rounded-full relative transition-all border border-dark-500">
+                    <div id="billing-dot" class="w-5 h-5 bg-accent-500 rounded-full absolute top-1 left-1 transition-all"></div>
+                </button>
+                <span class="text-sm text-gray-400" id="label-yearly">Yearly <span class="text-green-400 text-xs">-20%</span></span>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <!-- Starter -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-8 backdrop-blur-sm">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-300 mb-1">Starter</h3>
+                        <p class="text-sm text-gray-500">Cocok untuk pemula</p>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white price-monthly">Rp 25K</span>
+                        <span class="text-4xl font-bold text-white price-yearly hidden">Rp 20K</span>
+                        <span class="text-gray-500 text-sm">/bulan</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 1 vCPU Core</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 1GB RAM</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 20GB NVMe SSD</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 1TB Bandwidth</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> DDoS Protection</li>
+                    </ul>
+                    <button onclick="addToCart('VPS Starter', 25000)" class="w-full py-3 bg-dark-600 hover:bg-dark-500 border border-dark-500 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-all">
+                        Pilih Paket
+                    </button>
+                </div>
+
+                <!-- Pro (Popular) -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-8 backdrop-blur-sm relative border-accent-500/30 glow-accent-sm">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-accent-600 to-accent-500 rounded-full text-xs font-bold text-white">
+                        POPULAR
+                    </div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-white mb-1">Pro</h3>
+                        <p class="text-sm text-gray-500">Paling diminati</p>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white price-monthly">Rp 50K</span>
+                        <span class="text-4xl font-bold text-white price-yearly hidden">Rp 40K</span>
+                        <span class="text-gray-500 text-sm">/bulan</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 2 vCPU Core</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 4GB RAM</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 50GB NVMe SSD</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 3TB Bandwidth</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> DDoS Protection</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Priority Support</li>
+                    </ul>
+                    <button onclick="addToCart('VPS Pro', 50000)" class="w-full py-3 bg-gradient-to-r from-accent-600 to-accent-500 hover:from-accent-500 hover:to-accent-400 rounded-xl text-sm font-bold text-white transition-all glow-accent-sm hover:glow-accent">
+                        Pilih Paket
+                    </button>
+                </div>
+
+                <!-- Enterprise -->
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-8 backdrop-blur-sm">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-300 mb-1">Enterprise</h3>
+                        <p class="text-sm text-gray-500">Untuk kebutuhan besar</p>
+                    </div>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white price-monthly">Rp 100K</span>
+                        <span class="text-4xl font-bold text-white price-yearly hidden">Rp 80K</span>
+                        <span class="text-gray-500 text-sm">/bulan</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 4 vCPU Core</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 8GB RAM</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> 100GB NVMe SSD</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Unlimited BW</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> DDoS Protection</li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Dedicated IP</li>
+                    </ul>
+                    <button onclick="addToCart('VPS Enterprise', 100000)" class="w-full py-3 bg-dark-600 hover:bg-dark-500 border border-dark-500 rounded-xl text-sm font-medium text-gray-300 hover:text-white transition-all">
+                        Pilih Paket
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="py-20 relative">
+        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-500/30 to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-sm text-green-400 mb-4">
+                    <i data-lucide="heart" class="w-4 h-4"></i>
+                    Testimonials
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Apa Kata <span class="gradient-text">Mereka</span>?</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Dengarkan pengalaman dari pengguna yang sudah merasakan layanan kami.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-6">"Server mantap! Latency rendah, uptime 24/7, dan supportnya super cepat. Recommended banget buat yang mau bikin server game!"</p>
+                    <div class="flex items-center gap-3">
+                        <img src="http://static.photos/people/200x200/10" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <div class="text-sm font-semibold text-white">Andi Pratama</div>
+                            <div class="text-xs text-gray-500">Game Server Owner</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-6">"Panel-nya gampang banget dipakai, bahkan buat yang baru pertama kali manage VPS. Harga juga worth it banget sama kualitasnya."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="http://static.photos/people/200x200/25" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <div class="text-sm font-semibold text-white">Sari Dewi</div>
+                            <div class="text-xs text-gray-500">Web Developer</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-hover rounded-2xl bg-dark-700/50 p-6 backdrop-blur-sm">
+                    <div class="flex items-center gap-1 mb-4">
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                        <i data-lucide="star" class="w-4 h-4 text-yellow-400 fill-yellow-400"></i>
+                    </div>
+                    <p class="text-gray-300 text-sm mb-6">"Udah pake 6 bulan lebih, gak pernah down. Buat bot Discord dan web scraping jalan mulus. Suka banget sama auto backupnya!"</p>
+                    <div class="flex items-center gap-3">
+                        <img src="http://static.photos/people/200x200/40" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <div class="text-sm font-semibold text-white">Rizky Fauzan</div>
+                            <div class="text-xs text-gray-500">Bot Developer</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 relative">
+        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-500/30 to-transparent"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative rounded-3xl overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-accent-600 to-cyan-600 opacity-90"></div>
+                <div class="absolute inset-0 grid-bg opacity-30"></div>
+                <div class="relative px-8 py-16 sm:px-16 sm:py-20 text-center">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">Siap Mulai? 🚀</h2>
+                    <p class="text-lg text-white/80 max-w-2xl mx-auto mb-8">Join sekarang dan dapatkan server premium dengan harga terbaik. Langsung deploy, langsung pakai!</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="#products" class="px-8 py-4 bg-white hover:bg-gray-100 rounded-xl text-accent-700 font-bold transition-all">
+                            <span class="flex items-center justify-center gap-2">
+                                <i data-lucide="rocket" class="w-5 h-5"></i>
+                                Order Sekarang
+                            </span>
+                        </a>
+                        <a href="https://discord.gg/" target="_blank" class="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white font-semibold transition-all">
+                            <span class="flex items-center justify-center gap-2">
+                                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                                Tanya di Discord
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-dark-500/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-500 to-cyan-500 flex items-center justify-center">
+                            <i data-lucide="server" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <span class="text-lg font-bold gradient-text">ZansPanel</span>
+                    </a>
+                    <p class="text-sm text-gray-500 mb-4">Premium server & hosting solutions with the best performance and affordable prices.</p>
+                    <div class="flex items-center gap-2">
+                        <div class="status-online"></div>
+                        <span class="text-xs text-green-400">All Systems Operational</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4">Products</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#products" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">VPS Server</a></li>
+                        <li><a href="#products" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Game Server</a></li>
+                        <li><a href="#products" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Web Hosting</a></li>
+                        <li><a href="#products" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Discord Bot</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Discord Server</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Documentation</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">FAQ</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Status Page</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-semibold text-white mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Terms of Service</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">Refund Policy</a></li>
+                        <li><a href="#" class="text-sm text-gray-500 hover:text-accent-400 transition-colors">SLA</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-dark-500/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-sm text-gray-600">© 2025 ZansPanel. All rights reserved.</p>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-gray-600 hover:text-accent-400 transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-accent-400 transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-gray-600 hover:text-accent-400 transition-colors"><i data-lucide="message-circle" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="hidden fixed inset-0 z-[70]">
+        <div class="modal-overlay absolute inset-0" onclick="closeCart()"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-full max-w-md bg-dark-800 border-l border-dark-500/50 overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        Cart
+                    </h3>
+                    <button onclick="closeCart()" class="p-2 text-gray-400 hover:text-white transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div id="cart-items" class="space-y-4 mb-6"></div>
+                <div id="cart-empty" class="text-center py-12">
+                    <i data-lucide="shopping-bag" class="w-16 h-16 text-gray-700 mx-auto mb-4"></i>
+                    <p class="text-gray-500">Cart is empty</p>
+                </div>
+                <div id="cart-footer" class="hidden border-t border-dark-500/50 pt-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-400">Total</span>
+                        <span id="cart-total" class="text-xl font-bold gradient-text">Rp 0</span>
+                    </div>
+                    <button onclick="checkout()" class="w-full py-3 bg-gradient-to-r from-accent-600 to-accent-500 hover:from-accent-500 hover:to-accent-400 rounded-xl text-sm font-bold text-white transition-all glow-accent-sm">
+                        <span class="flex items-center justify-center gap-2">
+                            <i data-lucide="credit-card" class="w-4 h-4"></i>
+                            Checkout via WhatsApp
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Modal -->
+    <div id="order-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div class="modal-overlay absolute inset-0" onclick="closeOrderModal()"></div>
+        <div class="relative bg-dark-800 border border-dark-500/50 rounded-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeOrderModal()" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            <h3 class="text-xl font-bold text-white mb-2">Order <span class="gradient-text" id="order-product-name"></span></h3>
+            <p class="text-sm text-gray-500 mb-6">Isi data di bawah ini untuk melanjutkan order via WhatsApp.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-gray-400 mb-1 block">Nama Lengkap</label>
+                    <input type="text" id="order-name" placeholder="Masukkan nama kamu" class="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none focus:border-accent-500 transition-colors">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-400 mb-1 block">Nomor WhatsApp</label>
+                    <input type="text" id="order-wa" placeholder="08xxxxxxxxxx" class="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none focus:border-accent-500 transition-colors">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-400 mb-1 block">Catatan (opsional)</label>
+                    <textarea id="order-note" rows="3" placeholder="Catatan tambahan..." class="w-full px-4 py-3 bg-dark-600 border border-dark-500 rounded-xl text-white text-sm placeholder-gray-600 focus:outline-none focus:border-accent-500 transition-colors resize-none"></textarea>
+                </div>
+                <button onclick="submitOrder()" class="w-full py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 rounded-xl text-sm font-bold text-white transition-all">
+                    <span class="flex items-center justify-center gap-2">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        Kirim via WhatsApp
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="script.js"></script>
+<script src="https://deepsite.hf.co/deepsite-badge.js"></script>
+</body>
+</html>
